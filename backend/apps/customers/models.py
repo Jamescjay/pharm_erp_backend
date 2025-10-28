@@ -3,6 +3,7 @@ from decimal import Decimal
 
 
 class CustomerType(models.Model):
+  # walkin or VIP
     
     name = models.CharField(max_length=100)
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.00'))
