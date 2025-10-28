@@ -4,6 +4,9 @@ django-cors-headers==4.3.1
 django-extensions==3.2.3
 django-filter==23.3
 djangorestframework==3.14.0
-psycopg2-binary==2.9.7
+psycopg==3.2.11
+psycopg-binary==3.2.11
 pytz==2025.2
+setuptools==80.9.0
 sqlparse==0.5.3
+tzdata==2025.2
