@@ -76,7 +76,7 @@ DATABASES = {
     }
 }
 
-# switch to PostgreSQL later, create a .env file with:
+# switch to PostgreSQL later, create a .env file with :
 # DB_ENGINE=django.db.backends.postgresql
 # DB_NAME=pharmerp_db
 # DB_USER=postgres
