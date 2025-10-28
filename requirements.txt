@@ -1,11 +1,10 @@
-asgiref==3.80
+asgiref==3.10.0
 Django==4.2.7
 django-cors-headers==4.3.1
 django-extensions==3.2.3
 django-filter==23.3
 djangorestframework==3.14.0
-psycopg==3.2.11
-psycopg-binary==3.2.11
+psycopg2-binary==2.9.7
 pytz==2025.2
 setuptools==80.9.0
 sqlparse==0.5.3

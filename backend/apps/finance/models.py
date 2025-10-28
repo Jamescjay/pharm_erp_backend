@@ -9,11 +9,11 @@ class AuditModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True,
+        'users.User', null=True, blank=True,
         related_name="%(class)s_created", on_delete=models.SET_NULL
     )
     updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True,
+        'users.User', null=True, blank=True,
         related_name="%(class)s_updated", on_delete=models.SET_NULL
     )
 
@@ -156,7 +156,7 @@ class SupplierPayment(AuditModel):
 
 class PaymentAllocation(models.Model):
     payment = models.ForeignKey("SupplierPayment", on_delete=models.CASCADE, related_name="allocations")
-    purchase_order = models.ForeignKey("PurchaseOrder", on_delete=models.CASCADE, related_name="payment_allocations")
+    purchase_order = models.ForeignKey("suppliers.PurchaseOrder", on_delete=models.CASCADE, related_name="payment_allocations")
     amount_allocated = models.DecimalField(max_digits=20, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -236,32 +236,32 @@ class AccountsPayable(models.Model):
         return f"AP {self.invoice_number} - {self.supplier.name}"
 
 
-class FinancialReport(models.Model):
-    PERIOD_CHOICES = [
-        ("DAILY", "Daily"),
-        ("MONTHLY", "Monthly"),
-        ("QUARTERLY", "Quarterly"),
-        ("YEARLY", "Yearly"),
-    ]
+# class FinancialReport(models.Model):
+#     PERIOD_CHOICES = [
+#         ("DAILY", "Daily"),
+#         ("MONTHLY", "Monthly"),
+#         ("QUARTERLY", "Quarterly"),
+#         ("YEARLY", "Yearly"),
+#     ]
 
-    report_date = models.DateField()
-    period_type = models.CharField(max_length=20, choices=PERIOD_CHOICES)
-    total_revenue = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
-    total_expenses = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
-    gross_profit = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
-    net_profit = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
-    profit_margin = models.DecimalField(max_digits=7, decimal_places=4, default=Decimal("0.0000"))
-    accounts_receivable_total = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
-    accounts_payable_total = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
-    cash_flow = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
-    created_at = models.DateTimeField(auto_now_add=True)
+#     report_date = models.DateField()
+#     period_type = models.CharField(max_length=20, choices=PERIOD_CHOICES)
+#     total_revenue = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
+#     total_expenses = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
+#     gross_profit = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
+#     net_profit = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
+#     profit_margin = models.DecimalField(max_digits=7, decimal_places=4, default=Decimal("0.0000"))
+#     accounts_receivable_total = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
+#     accounts_payable_total = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
+#     cash_flow = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.00"))
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        db_table = "financial_reports"
-        ordering = ["-report_date"]
+#     class Meta:
+#         db_table = "financial_reports"
+#         ordering = ["-report_date"]
 
-    def __str__(self):
-        return f"{self.period_type} Report {self.report_date}"
+#     def __str__(self):
+#         return f"{self.period_type} Report {self.report_date}"
 
 
 class TaxRate(models.Model):

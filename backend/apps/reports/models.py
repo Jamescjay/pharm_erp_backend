@@ -102,7 +102,7 @@ class PurchaseReport(models.Model):
     total_items_purchased = models.IntegerField(default=0)
     total_suppliers = models.IntegerField(default=0)
     average_purchase_value = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    top_supplier = models.ForeignKey('suppliers.Supplier', on_delete=models.SET_NULL, null=True, blank=True, related_name='top_supplier_reports')
+    top_supplier = models.ForeignKey('suppliers.Supplier', on_delete=models.SET_NULL, null=True, blank=True, related_name='reports_top_supplier')
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -130,8 +130,8 @@ class SalesReport(models.Model):
     total_transactions = models.IntegerField(default=0)
     total_items_sold = models.IntegerField(default=0)
     average_transaction_value = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    top_product = models.ForeignKey('products.Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='top_product_reports')
-    top_customer = models.ForeignKey('customers.Customer', on_delete=models.SET_NULL, null=True, blank=True, related_name='top_customer_reports')
+    top_product = models.ForeignKey('products.Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='reports_top_product')
+    top_customer = models.ForeignKey('customers.Customer', on_delete=models.SET_NULL, null=True, blank=True, related_name='reports_top_customer')
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -195,7 +195,7 @@ class FinancialReport(models.Model):
 class SupplierPerformanceReport(models.Model):
     
     report_date = models.DateField(db_index=True)
-    supplier = models.ForeignKey('suppliers.Supplier', on_delete=models.CASCADE, related_name='performance_reports')
+    supplier = models.ForeignKey('suppliers.Supplier', on_delete=models.CASCADE, related_name='reports_performance')
     total_orders = models.IntegerField(default=0)
     total_amount_purchased = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     on_time_deliveries = models.IntegerField(default=0)
@@ -209,7 +209,7 @@ class SupplierPerformanceReport(models.Model):
         ordering = ['-report_date']
     
     def __str__(self):
-        return f"Supplier Performance - {self.supplier.name} - {self.report_date}"
+        return f"Supplier Performance - {self.report_date}"
 
 
 class CustomerReport(models.Model):

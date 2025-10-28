@@ -21,7 +21,7 @@ class Supplier(models.Model):
 class PurchaseOrder(models.Model):
     po_number = models.CharField(max_length=100, unique=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='purchase_orders')
-    ordered_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
+    ordered_by = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
     order_date = models.DateField()
     expected_delivery_date = models.DateField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -33,19 +33,19 @@ class PurchaseOrder(models.Model):
         return f"PO {self.po_number} - {self.supplier.name}"
 
 
-class SupplierPerformanceReports(models.Model):
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='performance_reports')
-    report_date = models.DateField()
-    total_orders = models.IntegerField()
-    total_amount_purchased = models.DecimalField(max_digits=10, decimal_places=2)
-    on_time_deliveries = models.IntegerField()
-    late_deliveries = models.IntegerField()
-    average_delivery_time = models.DecimalField(max_digits=5, decimal_places=2)  # e.g. 2.75 days
-    quality_rating = models.DecimalField(max_digits=5, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
+# class SupplierPerformanceReports(models.Model):
+#     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='performance_reports')
+#     report_date = models.DateField()
+#     total_orders = models.IntegerField()
+#     total_amount_purchased = models.DecimalField(max_digits=10, decimal_places=2)
+#     on_time_deliveries = models.IntegerField()
+#     late_deliveries = models.IntegerField()
+#     average_delivery_time = models.DecimalField(max_digits=5, decimal_places=2)  # e.g. 2.75 days
+#     quality_rating = models.DecimalField(max_digits=5, decimal_places=2)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Performance Report for {self.supplier.name} on {self.report_date}"
+#     def __str__(self):
+#         return f"Performance Report for {self.supplier.name} on {self.report_date}"
 
 
 class PurchaseOrderItem(models.Model):
@@ -62,19 +62,19 @@ class PurchaseOrderItem(models.Model):
         return f"{self.product_code} ({self.quantity} @ {self.unit_cost})"
 
 
-class SupplierPayment(models.Model):
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='payments')
-    payment_number = models.CharField(max_length=100, unique=True)
-    payment_date = models.DateField()
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.CharField(max_length=100)
-    reference_number = models.CharField(max_length=100, blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
-    paid_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+# class SupplierPayment(models.Model):
+#     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='payments')
+#     payment_number = models.CharField(max_length=100, unique=True)
+#     payment_date = models.DateField()
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     payment_method = models.CharField(max_length=100)
+#     reference_number = models.CharField(max_length=100, blank=True, null=True)
+#     notes = models.TextField(blank=True, null=True)
+#     paid_by = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Payment of {self.amount} to {self.supplier.name} on {self.payment_date}"
+#     def __str__(self):
+#         return f"Payment of {self.amount} to {self.supplier.name} on {self.payment_date}"
 
 
 class PurchaseReport(models.Model):
@@ -113,7 +113,7 @@ class StockMovement(models.Model):
     new_quantity = models.IntegerField()
     reference_id = models.CharField(max_length=100, blank=True, null=True)
     reason = models.TextField(blank=True, null=True)
-    moved_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
+    moved_by = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
     movement_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
 
