@@ -36,7 +36,7 @@ class StockMovement(models.Model):
     reference_id = models.IntegerField(blank=True, null=True)
     reference_type = models.CharField(max_length=50, blank=True, null=True)
     reason = models.TextField(blank=True, null=True)
-    moved_by = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, related_name='stock_movements')
+    moved_by = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True, related_name='stock_movements')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -62,7 +62,7 @@ class ExpiryTracking(models.Model):
 class StockAudit(models.Model):
     audit_number = models.CharField(max_length=100, unique=True)
     audit_date = models.DateField()
-    audited_by = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True, related_name='stock_audits')
+    audited_by = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True, related_name='stock_audits')
     status = models.CharField(max_length=50)
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
