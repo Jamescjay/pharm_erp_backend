@@ -19,18 +19,26 @@ class Supplier(models.Model):
 
 
 class PurchaseOrder(models.Model):
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('received', 'Received'),
+        ('cancelled', 'Cancelled'),
+    ]
+
     po_number = models.CharField(max_length=100, unique=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='purchase_orders')
-    ordered_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True)
+    ordered_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, related_name='orders_placed')
     order_date = models.DateField()
     expected_delivery_date = models.DateField(blank=True, null=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=50)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='draft')
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"PO {self.po_number} - {self.supplier.name}"
+        return f"PO-{self.po_number} ({self.supplier.name})"
 
 
 class SupplierPerformanceReports(models.Model):
@@ -40,7 +48,7 @@ class SupplierPerformanceReports(models.Model):
     total_amount_purchased = models.DecimalField(max_digits=10, decimal_places=2)
     on_time_deliveries = models.IntegerField()
     late_deliveries = models.IntegerField()
-    average_delivery_time = models.DecimalField(max_digits=5, decimal_places=2)  # e.g. 2.75 days
+    average_delivery_time = models.DecimalField(max_digits=5, decimal_places=2)  
     quality_rating = models.DecimalField(max_digits=5, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
