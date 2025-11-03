@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from django.contrib.auth.hashers import make_password
 from .models import User, Role, UserPermission, UserSession
+
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,6 +47,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'employee_id', 'first_name', 'last_name', 'email',
             'phone', 'role', 'password', 'profile_image_url'
         ]
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        validated_data['password_hash'] = make_password(password)
+        return User.objects.create(**validated_data)
 
 
 class PasswordChangeSerializer(serializers.Serializer):
