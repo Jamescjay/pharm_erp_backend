@@ -36,6 +36,10 @@ class User(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
 
+    @property
+    def is_authenticated(self):
+        return True
+
 class UserPermission(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name="user_permissions")
     module = models.CharField(max_length=100)
