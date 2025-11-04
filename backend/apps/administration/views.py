@@ -1,4 +1,4 @@
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
@@ -14,10 +14,11 @@ from .serializers import (
     NotificationSerializer, EmailMessageSerializer
 )
 
-
-import sys
-sys.path.append('..')
+from backend.apps.users.models import User
 from backend.apps.users.views import JWTAuthentication, IsAdmin
+from backend.apps.sales.models import Sale
+from backend.apps.customers.models import Customer
+from backend.apps.products.models import Product
 
 
 
@@ -73,7 +74,7 @@ class SystemSettingViewSet(viewsets.ModelViewSet):
         
         serializer = SystemSettingSerializer(setting, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save(updated_by=user)
+        setting = serializer.save(updated_by=user)
         
         # Log audit
         AuditLog.objects.create(
@@ -299,7 +300,6 @@ class NotificationViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Get all active users
-        from users.models import User
         users = User.objects.filter(is_active=True)
         
         # Create notifications
@@ -417,7 +417,8 @@ class EmailMessageViewSet(viewsets.ModelViewSet):
                 subject=subject,
                 body=body,
                 email_type=email_type,
-                status='failed'
+                status='failed',
+                error_message=str(e)
             )
             
             return Response({
@@ -470,7 +471,8 @@ class EmailMessageViewSet(viewsets.ModelViewSet):
                     subject=subject,
                     body=body,
                     email_type=email_type,
-                    status='failed'
+                    status='failed',
+                    error_message=str(e)
                 )
                 
                 failed_count += 1
@@ -487,28 +489,35 @@ class EmailMessageViewSet(viewsets.ModelViewSet):
 @permission_classes([IsAdmin])
 def system_dashboard(request):
     """Get system dashboard statistics"""
-    from users.models import User
-    from sales.models import Sale
-    from customers.models import Customer
-    from products.models import Product
-    
     # User statistics
     total_users = User.objects.count()
     active_users = User.objects.filter(is_active=True).count()
     
     # Today's activity
     today = timezone.now().date()
-    today_sales = Sale.objects.filter(created_at__date=today, sale_status='completed').count()
-    today_revenue = Sale.objects.filter(created_at__date=today, sale_status='completed').aggregate(
-        total=models.Sum('total_amount')
-    )['total'] or 0
     
-    # System health
-    total_customers = Customer.objects.count()
-    total_products = Product.objects.filter(is_active=True).count()
+    # Initialize default values
+    today_sales = 0
+    today_revenue = 0
+    total_customers = 0
+    total_products = 0
+    
+    # Only calculate if models exist
+    if Sale:
+        today_sales = Sale.objects.filter(created_at__date=today, sale_status='completed').count()
+        today_revenue_result = Sale.objects.filter(created_at__date=today, sale_status='completed').aggregate(
+            total=Sum('total_amount')
+        )
+        today_revenue = today_revenue_result['total'] or 0
+    
+    if Customer:
+        total_customers = Customer.objects.count()
+    
+    if Product:
+        total_products = Product.objects.filter(is_active=True).count()
     
     # Recent audit logs
-    recent_logs = AuditLog.objects.order_by('-created_at')[:10]
+    recent_logs = AuditLog.objects.select_related('user').order_by('-created_at')[:10]
     
     # Unread notifications
     unread_notifications = Notification.objects.filter(is_read=False).count()
@@ -520,7 +529,7 @@ def system_dashboard(request):
         },
         'today': {
             'sales': today_sales,
-            'revenue': today_revenue
+            'revenue': float(today_revenue) 
         },
         'system': {
             'customers': total_customers,
